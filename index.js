@@ -4,6 +4,7 @@ var path = require('path');
 var http = require('http');
 const db = require('./db');
 const express = require('express');
+let bodyParser = require('body-parser');
 
 const MongoStore = require('connect-mongo')
 
@@ -11,15 +12,17 @@ const MongoStore = require('connect-mongo')
 var oas3Tools = require('oas3-tools');
 var serverPort = 8085;
 
-// swaggerRouter configuration
-var options = {
-    routing: {
-        controllers: path.join(__dirname, './controllers')
-    },
-};
-
-var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
 var app = express();
+app.use(express.static(__dirname + '/controllers'))
+
+
+// var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
+
+app.use(bodyParser.urlencoded({
+    extended: false
+ }));
+ 
+ app.use(bodyParser.json());
 
 // Initialize the Swagger middleware
 http.createServer(app).listen(serverPort, function () {
@@ -32,3 +35,5 @@ http.createServer(app).listen(serverPort, function () {
 const bookRoutes = require("./controllers/Book");
 
 app.use('/book', bookRoutes)
+
+module.exports = app
